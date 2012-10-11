@@ -52,37 +52,41 @@ class block_resourcecounter extends block_base {
 
             $build = '';
 
-            // This course.
-            $sql = "SELECT count( module ) AS modules
-                    FROM ".$CFG->prefix."course_sections, ".$CFG->prefix."course_modules
-                    WHERE ".$CFG->prefix."course_sections.id = ".$CFG->prefix."course_modules.section
-                        AND ".$CFG->prefix."course_sections.course = :courseid";
+            // This course - editing teachers only
+            if (has_capability('moodle/course:update', get_context_instance(CONTEXT_COURSE, $this->page->course->id))) {
 
-            $params['courseid'] = $this->page->course->id;
-            $resources = $DB->get_records_sql($sql, $params, 0, 1);
+                $sql = "SELECT count( module ) AS modules
+                        FROM ".$CFG->prefix."course_sections, ".$CFG->prefix."course_modules
+                        WHERE ".$CFG->prefix."course_sections.id = ".$CFG->prefix."course_modules.section
+                            AND ".$CFG->prefix."course_sections.course = :courseid";
 
-            foreach ($resources as $resource) {
-                $build .= '<p>This course has '.$resource->modules." resources.</p>\n";
-            }
+                $params['courseid'] = $this->page->course->id;
+                $resources = $DB->get_records_sql($sql, $params, 0, 1);
 
-            // All courses.
-            $sql = "SELECT ".$CFG->prefix."course.id AS cid, ".$CFG->prefix."course.shortname, ".$CFG->prefix."course_modules.course AS courseid, count( module ) AS modules
-                    FROM ".$CFG->prefix."course, ".$CFG->prefix."course_sections, ".$CFG->prefix."course_modules
-                    WHERE ".$CFG->prefix."course.id = ".$CFG->prefix."course_sections.course
-                        AND ".$CFG->prefix."course_sections.id = ".$CFG->prefix."course_modules.section
-                    GROUP BY courseid
-                    ORDER BY modules DESC";
+                foreach ($resources as $resource) {
+                    $build .= '<p>This course has '.$resource->modules." resources.</p>\n";
+                }
+            } // end editing teacher only
 
-            $resources = $DB->get_records_sql($sql, null, 0, 20);
+            // All courses - admins only
+            if (has_capability('moodle/site:config', get_context_instance(CONTEXT_COURSE, $this->page->course->id))) {
 
-            $build .= '<p>';
-            foreach ($resources as $resource) {
-                $build .= '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$resource->cid.'">'.$resource->shortname.'</a> - '.$resource->modules." mods.<br>\n";
-            }
-            $build .= "</p>\n";
+                $sql = "SELECT ".$CFG->prefix."course.id AS cid, ".$CFG->prefix."course.shortname, ".$CFG->prefix."course_modules.course AS courseid, count( module ) AS modules
+                        FROM ".$CFG->prefix."course, ".$CFG->prefix."course_sections, ".$CFG->prefix."course_modules
+                        WHERE ".$CFG->prefix."course.id = ".$CFG->prefix."course_sections.course
+                            AND ".$CFG->prefix."course_sections.id = ".$CFG->prefix."course_modules.section
+                        GROUP BY courseid
+                        ORDER BY modules DESC";
 
-            // if is a teacher
-            //get how many resources this course uses
+                $resources = $DB->get_records_sql($sql, null, 0, 20);
+
+                $build .= '<p>';
+                foreach ($resources as $resource) {
+                    $build .= '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$resource->cid.'">'.$resource->shortname.'</a> - '.$resource->modules." mods.<br>\n";
+                }
+                $build .= "</p>\n";
+
+            } // end admin only.
 
             // if is an admin
             // List top 20 resource users for whole Moodle.
