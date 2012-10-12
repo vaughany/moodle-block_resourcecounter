@@ -56,7 +56,8 @@ class block_resourcecounter extends block_base {
 
                 $resources = $DB->get_record_sql($sql, array('courseid' => $this->page->course->id), 0, 1);
 
-                $build .= '<p>This course has '.$resources->modules." resources.</p>\n";
+                $build .= '<p>'.get_string('coursehas', 'block_resourcecounter').
+                    $resources->modules.get_string('resources', 'block_resourcecounter').".</p>\n";
 
             }
 
@@ -74,10 +75,10 @@ class block_resourcecounter extends block_base {
 
                 $build .= "<p>\n";
                 foreach ($resources as $resource) {
-                    $build .= '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$resource->cid.'">'.$resource->shortname.'</a> - '.$resource->modules." mods.<br>\n";
+                    $build .= '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$resource->cid.'">'.
+                        $resource->shortname.'</a> - '.$resource->modules." mods.<br>\n";
                 }
                 $build .= "</p>\n";
-
             }
 
             $this->content          = new stdClass;

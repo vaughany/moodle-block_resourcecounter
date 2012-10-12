@@ -22,4 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname']       = 'Resource Counter';
+$string['pluginname']   = 'Resource Counter';
+$string['coursehas']    = 'This course has ';
+$string['resources']    = ' resources.';
