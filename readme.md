@@ -8,3 +8,5 @@ A quick and dirty Moodle 2.x block which counts the number of modules / resource
 Note that all activities and resources are counted, not just those of the 'resource' module type.
 
 In the 0.2 release, the user needs the 'moodle/course:update' capability (essentially an editing teacher) in order to see the number of resources, and the user needs the 'moodle/site:config' capability (site admin) to see the 'top n' list.
+
+In the 0.2.1 release, made the code generally better. Irrelevant commented-out code removed, added better SQL code, that sort of thing.

@@ -39,12 +39,6 @@ class block_resourcecounter extends block_base {
         return false;
     }
 
-    public function specialization() {
-//        $this->title = isset($this->config->title) ?
-//            format_string($this->config->title) :
-//            format_string(get_string('pluginshortname', 'block_ekg'));
-    }
-
     public function get_content() {
         global $CFG, $DB;
 
@@ -52,46 +46,40 @@ class block_resourcecounter extends block_base {
 
             $build = '';
 
-            // This course - editing teachers only
+            // This course - editing teachers only.
             if (has_capability('moodle/course:update', get_context_instance(CONTEXT_COURSE, $this->page->course->id))) {
 
                 $sql = "SELECT count( module ) AS modules
-                        FROM ".$CFG->prefix."course_sections, ".$CFG->prefix."course_modules
-                        WHERE ".$CFG->prefix."course_sections.id = ".$CFG->prefix."course_modules.section
-                            AND ".$CFG->prefix."course_sections.course = :courseid";
+                        FROM {course_sections}, {course_modules}
+                        WHERE {course_sections}.id = {course_modules}.section
+                            AND {course_sections}.course = :courseid";
 
-                $params['courseid'] = $this->page->course->id;
-                $resources = $DB->get_records_sql($sql, $params, 0, 1);
+                $resources = $DB->get_record_sql($sql, array('courseid' => $this->page->course->id), 0, 1);
 
-                foreach ($resources as $resource) {
-                    $build .= '<p>This course has '.$resource->modules." resources.</p>\n";
-                }
-            } // end editing teacher only
+                $build .= '<p>This course has '.$resources->modules." resources.</p>\n";
 
-            // All courses - admins only
+            }
+
+            // All courses - admins only.
             if (has_capability('moodle/site:config', get_context_instance(CONTEXT_COURSE, $this->page->course->id))) {
 
-                $sql = "SELECT ".$CFG->prefix."course.id AS cid, ".$CFG->prefix."course.shortname, ".$CFG->prefix."course_modules.course AS courseid, count( module ) AS modules
-                        FROM ".$CFG->prefix."course, ".$CFG->prefix."course_sections, ".$CFG->prefix."course_modules
-                        WHERE ".$CFG->prefix."course.id = ".$CFG->prefix."course_sections.course
-                            AND ".$CFG->prefix."course_sections.id = ".$CFG->prefix."course_modules.section
+                $sql = "SELECT {course}.id AS cid, {course}.shortname, {course_modules}.course AS courseid, count( module ) AS modules
+                        FROM {course}, {course_sections}, {course_modules}
+                        WHERE {course}.id = {course_sections}.course
+                            AND {course_sections}.id = {course_modules}.section
                         GROUP BY courseid
                         ORDER BY modules DESC";
 
                 $resources = $DB->get_records_sql($sql, null, 0, 20);
 
-                $build .= '<p>';
+                $build .= "<p>\n";
                 foreach ($resources as $resource) {
                     $build .= '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$resource->cid.'">'.$resource->shortname.'</a> - '.$resource->modules." mods.<br>\n";
                 }
                 $build .= "</p>\n";
 
-            } // end admin only.
+            }
 
-            // if is an admin
-            // List top 20 resource users for whole Moodle.
-
-            // This section sorts out the output to screen.
             $this->content          = new stdClass;
             $this->content->text    = $build;
             $this->content->footer  = '';
