@@ -17,3 +17,5 @@ In the 0.2 (beta) release, the user needs the 'moodle/course:update' capability 
 In the 0.2.1 release, made the code generally better. Irrelevant commented-out code removed, added better SQL code, that sort of thing.
 
 In the 0.2.2 release, I moved strings in the code to the en_uk language pack. There's not many, to be honest...
+
+In the 0.2.3 release, various changes and better code.  One thing to note however, is the resource count at the top (the teachers) may not match exactly the resource count at the bottom (the admins). I've used two different SQL queries: the bottom one is pretty much the same as how Moodle gets a course's resources, but the top one queries one of Moodle's tables directly, which may show extra entries for modules which are hidden from the course but which have been used in the past.  In our case, the OU Blog has entries in the course, but because it is hidden site-wide, it doesn't show in the bottom count, so the top count shows four more.
