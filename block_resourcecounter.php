@@ -52,18 +52,26 @@ class block_resourcecounter extends block_base {
                 $sql1 = "SELECT count(*) AS cs
                             FROM {course_sections}
                             WHERE course = :courseid";
-
-                $sql2 = "SELECT count(*) AS cm
+                $sql2 = "SELECT {course}.id AS cid, {course_modules}.course AS courseid, count( module ) AS modules
+                        FROM {course}, {course_sections}, {course_modules}
+                        WHERE {course}.id = {course_sections}.course
+                            AND {course_sections}.id = {course_modules}.section
+                            AND {course}.id = :courseid
+                        GROUP BY courseid
+                        ORDER BY modules DESC";
+                $sql3 = "SELECT count(*) AS cm
                             FROM {course_modules}
                             WHERE course = :courseid";
 
                 $params = array('courseid' => $this->page->course->id);
                 $res1 = $DB->get_record_sql($sql1, $params);
                 $res2 = $DB->get_record_sql($sql2, $params);
+                $res3 = $DB->get_record_sql($sql3, $params);
 
                 $build .= '<p>'.get_string('coursehas', 'block_resourcecounter').
                     ($res1->cs - 1).' ('.$res1->cs.')'.get_string('sections', 'block_resourcecounter').
-                    $res2->cm.get_string('resources', 'block_resourcecounter')."</p>\n";
+                    $res2->modules.' ('.$res3->cm.') '.
+                    get_string('resources', 'block_resourcecounter')."</p>\n";
 
             }
 
@@ -77,7 +85,7 @@ class block_resourcecounter extends block_base {
                         GROUP BY courseid
                         ORDER BY modules DESC";
 
-                $resources = $DB->get_records_sql($sql, null, 0, 20);
+                $resources = $DB->get_records_sql($sql, null, 0, 25);
 
                 $build .= "<p>\n";
                 foreach ($resources as $resource) {
