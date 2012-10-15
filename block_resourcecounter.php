@@ -49,15 +49,21 @@ class block_resourcecounter extends block_base {
             // This course - editing teachers only.
             if (has_capability('moodle/course:update', get_context_instance(CONTEXT_COURSE, $this->page->course->id))) {
 
-                $sql = "SELECT count( module ) AS modules
-                        FROM {course_sections}, {course_modules}
-                        WHERE {course_sections}.id = {course_modules}.section
-                            AND {course_sections}.course = :courseid";
+                $sql1 = "SELECT count(*) AS cs
+                            FROM {course_sections}
+                            WHERE course = :courseid";
 
-                $resources = $DB->get_record_sql($sql, array('courseid' => $this->page->course->id), 0, 1);
+                $sql2 = "SELECT count(*) AS cm
+                            FROM {course_modules}
+                            WHERE course = :courseid";
+
+                $params = array('courseid' => $this->page->course->id);
+                $res1 = $DB->get_record_sql($sql1, $params);
+                $res2 = $DB->get_record_sql($sql2, $params);
 
                 $build .= '<p>'.get_string('coursehas', 'block_resourcecounter').
-                    $resources->modules.get_string('resources', 'block_resourcecounter').".</p>\n";
+                    ($res1->cs - 1).' ('.$res1->cs.')'.get_string('sections', 'block_resourcecounter').
+                    $res2->cm.get_string('resources', 'block_resourcecounter')."</p>\n";
 
             }
 
@@ -76,7 +82,7 @@ class block_resourcecounter extends block_base {
                 $build .= "<p>\n";
                 foreach ($resources as $resource) {
                     $build .= '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$resource->cid.'">'.
-                        $resource->shortname.'</a> - '.$resource->modules." mods.<br>\n";
+                        $resource->shortname.'</a> - '.$resource->modules.get_string('modules', 'block_resourcecounter')."<br>\n";
                 }
                 $build .= "</p>\n";
             }

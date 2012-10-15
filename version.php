@@ -21,7 +21,7 @@
  * @copyright  2012 onwards Paul Vaughan, paulvaughan@southdevon.ac.uk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$plugin->version        = 2012101201;                   // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version        = 2012101500;                   // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires       = 2010112400;                   // Moodle 2.0 or greater.
 $plugin->component      = 'block_resourcecounter';      // Full name of the plugin (used for diagnostics).
 $plugin->cron           = 0;                            // Period for cron to check this plugin (secs).

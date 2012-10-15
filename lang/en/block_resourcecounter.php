@@ -25,3 +25,5 @@
 $string['pluginname']   = 'Resource Counter';
 $string['coursehas']    = 'This course has ';
 $string['resources']    = ' resources.';
+$string['sections']     = ' sections containing ';
+$string['modules']      = ' modules.';
